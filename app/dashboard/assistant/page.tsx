@@ -5,14 +5,14 @@ import { supabase } from "@/lib/supabaseClient";
 import { Issue } from "@/lib/types";
 import { parseSupabaseTimestamp } from "@/lib/date";
 import { useRouter } from "next/navigation";
-import type { User } from "@supabase/supabase-js";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Bot,
   Building2,
   Send,
-  User,
+  User as UserIcon,
   Search,
   Settings,
 } from "lucide-react";
@@ -22,7 +22,7 @@ type Message = {
   text: string;
 };
 
-function getUserRole(user: User | null): string | undefined {
+function getUserRole(user: SupabaseUser | null): string | undefined {
   if (!user) return undefined;
   const metadataRole = user.user_metadata?.role;
   const appMetadataRole = user.app_metadata?.role;
@@ -241,7 +241,7 @@ export default function CitizenAssistantPage() {
                 </div>
                 {msg.role === "user" && (
                   <div className="h-9 w-9 rounded-lg bg-blue-500/30 border border-blue-300/40 grid place-items-center mt-1">
-                    <User className="h-4 w-4 text-blue-100" />
+                    <UserIcon className="h-4 w-4 text-blue-100" />
                   </div>
                 )}
               </div>
