@@ -41,3 +41,4 @@ export interface IssueFilters {
   priority?: IssuePriority[];
   search?: string;
 }
+

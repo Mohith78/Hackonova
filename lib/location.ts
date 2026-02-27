@@ -52,3 +52,4 @@ export function formatReadableLocation(
 
   return readable || payload.display_name || fallback;
 }
+

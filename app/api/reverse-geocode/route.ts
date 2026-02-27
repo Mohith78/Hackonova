@@ -46,3 +46,4 @@ export async function GET(request: Request) {
     return NextResponse.json({ readable: fallback }, { status: 200 });
   }
 }
+

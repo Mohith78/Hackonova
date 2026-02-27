@@ -122,3 +122,4 @@ export function IssueCard({ issue, onClick }: IssueCardProps) {
     </Card>
   );
 }
+

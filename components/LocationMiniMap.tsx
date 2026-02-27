@@ -84,3 +84,4 @@ export function LocationMiniMap({ center, className = "" }: LocationMiniMapProps
     </div>
   );
 }
+

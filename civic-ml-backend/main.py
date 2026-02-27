@@ -89,3 +89,4 @@ async def predict(file: UploadFile = File(...)):
             status_code=500,
             content={"error": "Prediction failed", "details": str(exc)},
         )
+
