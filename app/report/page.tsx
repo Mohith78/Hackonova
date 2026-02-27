@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { DepartmentType, IssuePriority } from "@/lib/types";
 import { LocationMiniMap } from "@/components/LocationMiniMap";
+import { formatCoordinates } from "@/lib/location";
 import type { User } from "@supabase/supabase-js";
 
 function formatFileSize(bytes: number) {
@@ -120,21 +121,17 @@ export default function ReportPage() {
     });
 
   const reverseGeocode = async (lat: number, lng: number) => {
+    const coordinateFallback = formatCoordinates(lat, lng);
     try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`,
-        {
-          headers: { "Accept-Language": "en" },
-        }
-      );
+      const response = await fetch(`/api/reverse-geocode?lat=${lat}&lng=${lng}`);
       if (!response.ok) {
-        return `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+        return coordinateFallback;
       }
 
-      const data = (await response.json()) as { display_name?: string };
-      return data.display_name || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+      const data = (await response.json()) as { readable?: string };
+      return data.readable || coordinateFallback;
     } catch {
-      return `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+      return coordinateFallback;
     }
   };
 
@@ -263,13 +260,22 @@ export default function ReportPage() {
           aiCategory = aiResult.category;
           aiConfidence = aiResult.confidence;
         } else {
-          const result = await classifyImage(file);
-          if (result) {
-            aiCategory = result.category;
-            aiConfidence = result.confidence;
-            setAiResult(result);
-          } else {
+          try {
+            const result = await classifyImage(file);
+            if (result) {
+              aiCategory = result.category;
+              aiConfidence = result.confidence;
+              setAiResult(result);
+            } else {
+              setAiResult(null);
+            }
+          } catch (err) {
+            const message =
+              err instanceof Error
+                ? err.message
+                : "Image uploaded, but AI detection is currently unavailable.";
             setAiResult(null);
+            setAiError(message);
           }
         }
 
@@ -531,7 +537,10 @@ export default function ReportPage() {
                       setAiError("Could not detect issue type from this image.");
                     }
                   } catch (err) {
-                    const message = err instanceof Error ? err.message : "Could not detect issue type from this image.";
+                    const message =
+                      err instanceof Error
+                        ? err.message
+                        : "Could not detect issue type from this image.";
                     setAiError(message);
                   } finally {
                     setAiLoading(false);

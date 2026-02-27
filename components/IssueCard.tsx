@@ -35,10 +35,7 @@ export function IssueCard({ issue, onClick }: IssueCardProps) {
     const loadAddress = async () => {
       try {
         const response = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`,
-          {
-            headers: { "Accept-Language": "en" },
-          }
+          `/api/reverse-geocode?lat=${lat}&lng=${lng}`
         );
 
         if (!response.ok) {
@@ -48,9 +45,9 @@ export function IssueCard({ issue, onClick }: IssueCardProps) {
           return;
         }
 
-        const data = (await response.json()) as { display_name?: string };
+        const data = (await response.json()) as { readable?: string };
         if (!cancelled) {
-          setAddress(data.display_name || coordinateFallback);
+          setAddress(data.readable || coordinateFallback);
         }
       } catch {
         if (!cancelled) {
